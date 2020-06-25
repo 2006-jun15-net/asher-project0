@@ -17,87 +17,62 @@ namespace StoreApplication.ConsoleApp
 
         private static void loadData()
         {
-            string filePath = "../../../Product-data.json";
-            List<Product> data;
+            //string filePath = "../../../Product-data.json";
+            string filePath = "../../../Location-data.json";
+            //List<Product> data;
+            List<Location> data;
             string initialJson = File.ReadAllText(filePath);
-            data = JsonConvert.DeserializeObject<List<Product>>(initialJson);
+            //data = JsonConvert.DeserializeObject<List<Product>>(initialJson);
+            data = JsonConvert.DeserializeObject<List<Location>>(initialJson);
 
-            Console.WriteLine(data[0].name + " " + data[0].price + " " + data[0].maxPerOrder);
+            //Console.WriteLine(data[0].name + ", " + data[0].price + ", " + data[0].maxPerOrder);
+            Console.WriteLine(data[0].address + ", " + data[0].city + ", " + data[0].state);
         }
         private static void initializeData()
         {
-            List<Product> productData = new List<Product>
+            List<Location> locationData = new List<Location>
             {
-                new Product
+                new Location
                 {
-                    name = "Xbox One Console",
-                    price = 500.00,
-                    maxPerOrder = 2
+                    address = "624 Central Dr.",
+                    city = "Austin",
+                    state = "TX"
                 },
-                new Product
+                new Location
                 {
-                    name = "Playstation 4",
-                    price = 550.00,
-                    maxPerOrder = 2
+                    address = "835 Oakwood Blvd.",
+                    city = "Chicago",
+                    state = "IL"
                 },
-                new Product
+                new Location
                 {
-                    name = "Nintendo Switch",
-                    price = 500.00,
-                    maxPerOrder = 2
+                    address = "294 Harwood Dr.",
+                    city = "New York City",
+                    state = "NY"
                 },
-                new Product
+                new Location
                 {
-                    name = "Halo 5",
-                    price = 60.00,
-                    maxPerOrder = 3
+                    address = "7147 Grand Avenue",
+                    city = "Los Angelas",
+                    state = "CA"
                 },
-                new Product
+                new Location
                 {
-                    name = "Dead Space",
-                    price = 20.00,
-                    maxPerOrder = 3
-                },
-                new Product
-                {
-                    name = "Spider-Man the Game",
-                    price = 60.00,
-                    maxPerOrder = 3
-                },
-                new Product
-                {
-                    name = "Fire Emblem: Three Houses",
-                    price = 60.00,
-                    maxPerOrder = 3
-                },
-                new Product
-                {
-                    name = "The Witcher 3: Wild Hunt",
-                    price = 35.00,
-                    maxPerOrder = 3
-                },
-                new Product
-                {
-                    name = "Call of Duty: Modern Warfare",
-                    price = 60.00,
-                    maxPerOrder = 3
-                },
-                new Product
-                {
-                    name = "Mass Effect Trilogy Collection",
-                    price = 30.00,
-                    maxPerOrder = 3
+                    address = "7291 Primrose Road",
+                    city = "New Orleans",
+                    state = "LA"
                 }
             };
 
-            string filePath = "../../../Product-data.json";
 
-            string json = JsonConvert.SerializeObject(productData, Formatting.Indented);
+            string filePath = "../../../Location-data.json";
+
+            string json = JsonConvert.SerializeObject(locationData, Formatting.Indented);
             File.WriteAllText(filePath, json);
             using (StreamWriter file = File.CreateText(filePath))
             {
                 JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(file, productData);
+                serializer.Serialize(file, locationData);
             }
             Console.WriteLine("Success");
 
