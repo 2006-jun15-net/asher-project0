@@ -32,11 +32,11 @@ namespace StoreApplication.Library
             {
                 string Json = File.ReadAllText("../../../Location-data.json");
                 _locationData = JsonConvert.DeserializeObject<List<Location>>(Json);
-                Console.WriteLine("Location Success");
+                //Console.WriteLine("Location Success");
 
                 Json = File.ReadAllText("../../../Product-data.json");
                 _productData = JsonConvert.DeserializeObject<List<Product>>(Json);
-                Console.WriteLine("Product Success");
+                //Console.WriteLine("Product Success");
             }
             catch (FileNotFoundException e)
             {
