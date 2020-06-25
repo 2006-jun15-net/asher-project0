@@ -8,9 +8,9 @@ namespace StoreApplication.Testing
     {
         readonly Customer customer = new Customer();
         [Fact]
-        public void Test1()
+        public void FirstName_EmptyValue_ThrowsException()
         {
-
+            Assert.ThrowsAny<ArgumentException>(() => customer.firstName = string.Empty);
         }
     }
 }
