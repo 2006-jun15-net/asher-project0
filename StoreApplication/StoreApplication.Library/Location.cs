@@ -7,6 +7,8 @@ namespace StoreApplication.Library
     public class Location
     {
         private string _address;
+        private string _city;
+        private string _state;
         private List<Order> _orderHistory = new List<Order>();
         private Dictionary<Product, int> _inventory = new Dictionary<Product, int>();
 
@@ -16,6 +18,22 @@ namespace StoreApplication.Library
             set
             {
                 _address = value;
+            }
+        }
+        public string city
+        {
+            get => _city;
+            set
+            {
+                _city = value;
+            }
+        }
+        public string state
+        {
+            get => _state;
+            set
+            {
+                _state = value;
             }
         }
         public List<Order> OrderHistory { get; set; } = new List<Order>();
