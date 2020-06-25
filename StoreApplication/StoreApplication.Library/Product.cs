@@ -6,12 +6,9 @@ namespace StoreApplication.Library
 {
     public class Product
     {
-        private static int idSeed = 1;
-
         private string _name;
         private double _price;
         private int _maxPurchaseAmount;
-        private int _productID;
 
         public string name
         {
@@ -34,16 +31,6 @@ namespace StoreApplication.Library
         public int maxPurchaseAmount
         {
             get => _maxPurchaseAmount;
-        }
-
-        public Product(string name, double price, int maxPurchaseAmount)
-        {
-            this._productID = idSeed;
-            idSeed++;
-
-            this._name = name;
-            this._price = price;
-            this._maxPurchaseAmount = maxPurchaseAmount;
         }
     }
 }

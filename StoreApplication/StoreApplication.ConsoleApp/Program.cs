@@ -1,5 +1,6 @@
 ﻿using StoreApplication.Library;
 using System;
+using System.Collections.Generic;
 
 namespace StoreApplication.ConsoleApp
 {
@@ -7,8 +8,8 @@ namespace StoreApplication.ConsoleApp
     {
         static void Main(string[] args)
         {
-            Customer c = new Customer("Asher", "Williams");
-            Console.WriteLine($"First name: {c.firstName}, Last name: {c.lastName}, ID: {c.customerID}");
+            
+
         }
     }
 }
