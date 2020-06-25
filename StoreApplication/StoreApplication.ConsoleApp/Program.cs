@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StoreApplication.Library;
+using System;
 
 namespace StoreApplication.ConsoleApp
 {
@@ -6,7 +7,8 @@ namespace StoreApplication.ConsoleApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Customer c = new Customer("Asher", "Williams");
+            Console.WriteLine($"First name: {c.firstName}, Last name: {c.lastName}, ID: {c.customerID}");
         }
     }
 }
