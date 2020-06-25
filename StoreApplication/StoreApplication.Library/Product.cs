@@ -8,7 +8,7 @@ namespace StoreApplication.Library
     {
         private string _name;
         private double _price;
-        private int _maxPurchaseAmount;
+        private int _maxPerOrder;
 
         public string name
         {
@@ -16,7 +16,7 @@ namespace StoreApplication.Library
 
             set
             {
-
+                _name = value;
             }
         }
         public double price
@@ -25,12 +25,18 @@ namespace StoreApplication.Library
 
             set
             {
-
+                _price = value;
             }
         }
-        public int maxPurchaseAmount
+        // remember to delete set function once serialization works
+        public int maxPerOrder
         {
-            get => _maxPurchaseAmount;
+            get => _maxPerOrder;
+
+            set
+            {
+                _maxPerOrder = value;
+            }
         }
     }
 }

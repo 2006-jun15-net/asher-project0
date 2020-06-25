@@ -17,7 +17,7 @@ namespace StoreApplication.Library
 
             set
             {
-
+                _customer = value;
             }
         }
         public DateTime timeOrdered
@@ -26,7 +26,7 @@ namespace StoreApplication.Library
 
             set
             {
-
+                _timeOrdered = value;
             }
         }
         public Location location
@@ -35,7 +35,7 @@ namespace StoreApplication.Library
 
             set
             {
-
+                _location = value;
             }
         }
         public double totalAmount
@@ -44,7 +44,7 @@ namespace StoreApplication.Library
 
             set
             {
-
+                _TotalAmount = value;
             }
         }
     }
