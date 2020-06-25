@@ -4,7 +4,7 @@ using System.Text;
 
 namespace StoreApplication.Library
 {
-    class Location
+    public class Location
     {
         private static int idSeed = 1;
 
