@@ -14,27 +14,7 @@ namespace StoreApplication.ConsoleApp
         {
             //initializeData();
             Store.LoadData();
-            string input;
-            while(true)
-            {
-                input = UI.IntroMenu();
-                if(input == "1")
-                {
-                    Console.WriteLine();
-                    Console.WriteLine("Signing In");
-                    break;
-                }
-                else if(input == "2")
-                {
-                    break;
-                }
-                else
-                {
-                    Console.WriteLine();
-                    Console.WriteLine("That's not a valid choice. Please try again.");
-                    Console.WriteLine();
-                }
-            }
+            UI.IntroMenu();
             
             //Console.WriteLine($"Location Count: {Store.LocationData.Count}");
             //Console.WriteLine($"Product Count: {Store.ProductData.Count}");
