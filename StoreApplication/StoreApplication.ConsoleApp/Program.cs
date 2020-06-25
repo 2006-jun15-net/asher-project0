@@ -11,9 +11,19 @@ namespace StoreApplication.ConsoleApp
     {
         static void Main(string[] args)
         {
-            initializeData();
+            //initializeData();
+            loadData();
         }
 
+        private static void loadData()
+        {
+            string filePath = "../../../Product-data.json";
+            List<Product> data;
+            string initialJson = File.ReadAllText(filePath);
+            data = JsonConvert.DeserializeObject<List<Product>>(initialJson);
+
+            Console.WriteLine(data[0].name + " " + data[0].price + " " + data[0].maxPerOrder);
+        }
         private static void initializeData()
         {
             List<Product> productData = new List<Product>
