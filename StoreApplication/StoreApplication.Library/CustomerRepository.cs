@@ -19,20 +19,25 @@ namespace StoreApplication.Library
             return context.Customer.ToList();
         }
 
-        public Customer findCustomerByName(string FirstName, string LastName)
+        private List<Customer> findCustomerByName(string FirstName, string LastName)
         {
-            Customer customer = null;
-            try
-            {
-                customer = context.Customer.Single(c => (c.FirstName == FirstName) && (c.LastName == LastName));
-            }
-            catch(InvalidOperationException)
-            {
-                Console.WriteLine("There are multiple entries in the database with those values");
-            }
+
+            List<Customer> customer = context.Customer.Where(c => (c.FirstName == FirstName) && (c.LastName == LastName)).ToList();
             return customer;
         }
 
+        public Customer findCustomer(string FirstName, string LastName, string UserName)
+        {
+            List<Customer> customers = findCustomerByName(FirstName, LastName);
+            if(customers.Count > 1)
+            {
+                return customers.Find(c => c.UserName == UserName);
+            }
+            else
+            {
+                return customers[0];
+            }
+        }
         public void Save()
         {
             context.SaveChanges();

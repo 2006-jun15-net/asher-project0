@@ -18,7 +18,7 @@ namespace StoreApplication.ConsoleApp
             //Store.LoadFromDatabase(context);
 
             CustomerRepository repository = new CustomerRepository(context);
-            var customer = repository.findCustomerByName("Christian", "Roberts");
+            var customer = repository.findCustomer("Christian", "Roberts", "EpicConsole123");
             Console.WriteLine(customer.CustomerId);
         }
     }

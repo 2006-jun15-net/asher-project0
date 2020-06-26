@@ -9,7 +9,7 @@ namespace StoreApplication.Library
     public interface ICustomerRepository
     {
         IEnumerable GetCustomers();
-        Customer findCustomerByName(string FirstName, string LastName);
+        Customer findCustomer(string FirstName, string LastName, string UserName);
         void Save();
     }
 }
