@@ -1,4 +1,7 @@
-﻿using Newtonsoft.Json;
+﻿using DataAccess.Model;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using StoreApplication.Library;
 using System;
 using System.Collections.Generic;
@@ -10,6 +13,15 @@ namespace StoreApplication.ConsoleApp
 {
     class Program
     {
+        public static readonly ILoggerFactory MyLoggerFactory
+            = LoggerFactory.Create(builder => { builder.AddConsole(); });
+
+        public static readonly DbContextOptions<Project0StoreContext> Options = new DbContextOptionsBuilder<Project0StoreContext>()
+            //.UseLoggerFactory(MyLoggerFactory)
+            .UseSqlServer(SecretConfiguration.ConnectionString)
+            .Options;
+        public Project0StoreContext context = new Project0StoreContext(Options);
+
         static void Main(string[] args)
         {
             //initializeData();
@@ -39,5 +51,12 @@ namespace StoreApplication.ConsoleApp
             //using (var fileStream = new FileStream(filePath, FileMode.Create)) {}
             */
         }
+    }
+
+    internal class SecretConfiguration
+    {
+        internal const string ConnectionString = "Server=tcp:williams1998.database.windows.net,1433;Initial Catalog=Project-0-Store;" +
+            "Persist Security Info=False;User ID=asher;Password=Clarkezlayer571;MultipleActiveResultSets=False;" +
+            "Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
     }
 }

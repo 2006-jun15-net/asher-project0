@@ -4,13 +4,13 @@ using System.Text;
 
 namespace StoreApplication.Library
 {
-    public class Location
+    public class StoreLocation
     {
         private string _address;
         private string _city;
         private string _state;
         private List<Order> _orderHistory = new List<Order>();
-        private Dictionary<Product, int> _inventory = new Dictionary<Product, int>();
+        private Dictionary<StoreProduct, int> _inventory = new Dictionary<StoreProduct, int>();
 
         public string address
         {
@@ -37,6 +37,6 @@ namespace StoreApplication.Library
             }
         }
         public List<Order> OrderHistory { get; set; } = new List<Order>();
-        public Dictionary<Product, int> Inventory { get; set; } = new Dictionary<Product, int>();
+        public Dictionary<StoreProduct, int> Inventory { get; set; } = new Dictionary<StoreProduct, int>();
     }
 }

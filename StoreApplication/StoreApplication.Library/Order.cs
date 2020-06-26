@@ -6,12 +6,12 @@ namespace StoreApplication.Library
 {
     public class Order
     {
-        private Customer _customer;
+        private StoreCustomer _customer;
         private DateTime _timeOrdered;
-        private Location _location;
+        private StoreLocation _location;
         private double _TotalAmount;
 
-        public Customer customer
+        public StoreCustomer customer
         {
             get => _customer;
 
@@ -29,7 +29,7 @@ namespace StoreApplication.Library
                 _timeOrdered = value;
             }
         }
-        public Location location
+        public StoreLocation location
         {
             get => _location;
 

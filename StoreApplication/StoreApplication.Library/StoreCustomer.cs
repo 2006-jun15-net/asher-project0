@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace StoreApplication.Library
 {
-    public class Customer
+    public class StoreCustomer
     {
         private string _firstName;
         private string _lastName;
