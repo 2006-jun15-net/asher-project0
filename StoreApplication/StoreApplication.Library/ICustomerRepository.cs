@@ -10,6 +10,7 @@ namespace StoreApplication.Library
     {
         IEnumerable GetCustomers();
         Customer findCustomer(string FirstName, string LastName, string UserName);
+        void AddCustomer(Customer customer);
         void Save();
     }
 }

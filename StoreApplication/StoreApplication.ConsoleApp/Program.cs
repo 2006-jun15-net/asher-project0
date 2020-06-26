@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using StoreApplication.Library;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace StoreApplication.ConsoleApp
 {
@@ -19,7 +21,6 @@ namespace StoreApplication.ConsoleApp
 
             CustomerRepository repository = new CustomerRepository(context);
             var customer = repository.findCustomer("Christian", "Roberts", "EpicConsole123");
-            Console.WriteLine(customer.CustomerId);
         }
     }
 }
