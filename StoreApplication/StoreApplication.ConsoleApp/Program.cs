@@ -21,6 +21,22 @@ namespace StoreApplication.ConsoleApp
 
             CustomerRepository repository = new CustomerRepository(context);
             var customer = repository.findCustomer("Christian", "Roberts", "EpicConsole123");
+
+            Console.Write("Enter a username: ");
+            string user = Console.ReadLine();
+            if(user.Length > 26)
+            {
+                Console.WriteLine("Username too long");
+            }
+            else
+            {
+                Customer result2 = context.Customer.FirstOrDefault(c => c.UserName == user);
+                if (result2 == null)
+                {
+                    Console.WriteLine("not in DB");
+                }
+            }
+            
         }
     }
 }

@@ -35,7 +35,6 @@ namespace StoreApplication.Library
             _productData = context.Product.ToList();
             _locationData = context.Location.ToList();
             _customerData = context.Customer.ToList();
-
         }
     }
 }
