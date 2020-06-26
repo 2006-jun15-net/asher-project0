@@ -1,3 +1,5 @@
+using DataAccess.Model;
+using Microsoft.EntityFrameworkCore;
 using StoreApplication.Library;
 using System;
 using Xunit;
@@ -6,18 +8,22 @@ namespace StoreApplication.Testing
 {
     public class CustomerTest
     {
-        readonly CustomerRepository customer = new CustomerRepository();
+        public static readonly DbContextOptions<Project0StoreContext> Options = new DbContextOptionsBuilder<Project0StoreContext>()
+            //.UseLoggerFactory(MyLoggerFactory)
+            .UseSqlServer(SecretConfiguration.ConnectionString)
+            .Options;
+        public static Project0StoreContext context = new Project0StoreContext(Options);
 
-        [Fact]
-        public void FirstName_EmptyValue_ThrowsException()
-        {
-            Assert.ThrowsAny<ArgumentException>(() => customer.firstName = string.Empty);
-        }
+        readonly CustomerRepository repository = new CustomerRepository(context);
 
-        [Fact]
-        public void FirstName_NullValue_ThrowsException()
+        [Theory]
+        [InlineData("Asher", "Williams", "Trasher571", 1)]
+        [InlineData("Christian", "Roberts", "EpicConsole123", 3)]
+        [InlineData("Luke", "Skywalker", "R3b3lJedi420", 5)]
+        public void Finds_Correct_Customer_By_Name(string FirstName, string LastName, string UserName, int ID)
         {
-            Assert.ThrowsAny<ArgumentException>(() => customer.firstName = null);
+            var customer = repository.findCustomer(FirstName, LastName, UserName);
+            Assert.Equal(ID.ToString(), customer.CustomerId.ToString());
         }
     }
 }
