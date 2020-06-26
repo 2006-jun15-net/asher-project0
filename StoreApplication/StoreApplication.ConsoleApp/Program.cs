@@ -13,8 +13,9 @@ namespace StoreApplication.ConsoleApp
         static void Main(string[] args)
         {
             //initializeData();
-            Store.LoadData();
-            UI.IntroMenu();
+            //Store.LoadData();
+            //UI.IntroMenu();
+            
             
             //Console.WriteLine($"Location Count: {Store.LocationData.Count}");
             //Console.WriteLine($"Product Count: {Store.ProductData.Count}");
