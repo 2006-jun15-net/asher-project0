@@ -7,9 +7,10 @@ namespace StoreApplication.Library
     {
         private string _firstName;
         private string _lastName;
+        private string _userName;
         private List<Order> _orderHistory = new List<Order>();
 
-        public string firstName
+        public string FirstName
         {
             get => _firstName;
             set
@@ -28,7 +29,7 @@ namespace StoreApplication.Library
                 }
             }
         }
-        public string lastName 
+        public string LastName 
         {
             get => _lastName; 
             set
@@ -44,6 +45,25 @@ namespace StoreApplication.Library
                 else
                 {
                     _lastName = value;
+                }
+            }
+        }
+        public string UserName
+        {
+            get => _userName;
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException("Last name cannot be null");
+                }
+                else if (value.Length == 0)
+                {
+                    throw new ArgumentException("First name cannot be empty.", nameof(value));
+                }
+                else
+                {
+                    _userName = value;
                 }
             }
         }

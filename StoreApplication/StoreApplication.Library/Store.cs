@@ -1,15 +1,17 @@
 ﻿using DataAccess.Model;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using StoreApplication.ConsoleApp;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security;
 using System.Text;
 
 namespace StoreApplication.Library
 {
-    public static class Store
+    public class Store
     {
         public static readonly DbContextOptions<Project0StoreContext> Options = new DbContextOptionsBuilder<Project0StoreContext>()
             //.UseLoggerFactory(MyLoggerFactory)
@@ -17,28 +19,31 @@ namespace StoreApplication.Library
             .Options;
         public static Project0StoreContext context = new Project0StoreContext(Options);
 
-        private static List<StoreProduct> _productData;
-        private static List<StoreLocation> _locationData;
-        private static List<StoreCustomer> _customerData = new List<StoreCustomer>();
+        private static List<Product> _productData;
+        private static List<Location> _locationData;
+        private static List<Customer> _customerData;
 
-        public static List<StoreProduct> ProductData
+        public static List<Product> ProductData
         {
             get => _productData;
         }
-        public static List<StoreLocation> LocationData
+        public static List<Location> LocationData
         {
             get => _locationData;
         }
-        public static List<StoreCustomer> CustomerData
+        public static List<Customer> CustomerData
         {
             get => _customerData;
         }
 
-        public static void LoadDatabase()
+        public static void LoadFromDatabase()
         {
-            
+            _productData = context.Product.ToList();
+            _locationData = context.Location.ToList();
+            _customerData = context.Customer.ToList();
         }
-        public static void LoadData()
+        /*
+        public static void DeserializeData()
         {
             try
             {
@@ -63,12 +68,6 @@ namespace StoreApplication.Library
                 Console.WriteLine($"Error while loading: {e.Message}");
             }
         }
-
-        internal class SecretConfiguration
-        {
-            internal const string ConnectionString = "Server=tcp:williams1998.database.windows.net,1433;Initial Catalog=Project-0-Store;" +
-                "Persist Security Info=False;User ID=asher;Password=Clarkezlayer571;MultipleActiveResultSets=False;" +
-                "Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;";
-        }
+        */
     }
 }

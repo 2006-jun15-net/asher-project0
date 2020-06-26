@@ -1,6 +1,7 @@
 ﻿using DataAccess.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using StoreApplication.Library;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -70,6 +71,16 @@ namespace StoreApplication.ConsoleApp
                 }
             }
             
+        }
+
+        public static void AddCustomer()
+        {
+            while(true)
+            {
+                Console.Write("Whats your First Name?: ");
+                input = Console.ReadLine();
+                
+            }
         }
 
         public static void InvalidInput()
