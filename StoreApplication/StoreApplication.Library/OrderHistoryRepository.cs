@@ -4,7 +4,7 @@ using System.Text;
 
 namespace StoreApplication.Library
 {
-    interface IOrderHistory
+    class OrderHistoryRepository
     {
     }
 }

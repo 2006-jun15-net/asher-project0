@@ -6,7 +6,7 @@ namespace StoreApplication.Testing
 {
     public class CustomerTest
     {
-        readonly StoreCustomer customer = new StoreCustomer();
+        readonly CustomerRepository customer = new CustomerRepository();
 
         [Fact]
         public void FirstName_EmptyValue_ThrowsException()

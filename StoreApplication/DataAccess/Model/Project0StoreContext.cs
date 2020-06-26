@@ -18,24 +18,28 @@ namespace DataAccess.Model
         public virtual DbSet<Customer> Customer { get; set; }
         public virtual DbSet<Inventory> Inventory { get; set; }
         public virtual DbSet<Location> Location { get; set; }
-        public virtual DbSet<Merchandise> Merchandise { get; set; }
-        public virtual DbSet<PlacedOrders> PlacedOrders { get; set; }
+        public virtual DbSet<OrderHistory> OrderHistory { get; set; }
+        public virtual DbSet<Orders> Orders { get; set; }
         public virtual DbSet<Product> Product { get; set; }
-        public virtual DbSet<Purchased> Purchased { get; set; }
-        public virtual DbSet<Stock> Stock { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
+                optionsBuilder.UseSqlServer("Server=tcp:williams1998.database.windows.net,1433;Initial Catalog=Project-0-Store;Persist Security Info=False;User ID=asher;Password=Clarkezlayer571;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Customer>(entity =>
             {
-                entity.HasKey(e => e.UserName)
-                    .HasName("PK__Customer__C9F284571D4C1110");
+                entity.HasIndex(e => e.UserName)
+                    .HasName("UQ__Customer__C9F28456932A4D7B")
+                    .IsUnique();
 
-                entity.Property(e => e.UserName).HasMaxLength(26);
-
-                entity.Property(e => e.CustomerId)
-                    .HasColumnName("customerID")
-                    .ValueGeneratedOnAdd();
+                entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
 
                 entity.Property(e => e.FirstName)
                     .IsRequired()
@@ -44,147 +48,110 @@ namespace DataAccess.Model
                 entity.Property(e => e.LastName)
                     .IsRequired()
                     .HasMaxLength(200);
+
+                entity.Property(e => e.UserName)
+                    .IsRequired()
+                    .HasMaxLength(26);
             });
 
             modelBuilder.Entity<Inventory>(entity =>
             {
-                entity.Property(e => e.InventoryId).HasColumnName("inventoryID");
+                entity.Property(e => e.InventoryId).HasColumnName("InventoryID");
 
-                entity.Property(e => e.InStock).HasColumnName("inStock");
+                entity.Property(e => e.LocationId).HasColumnName("LocationID");
+
+                entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
+                entity.HasOne(d => d.Location)
+                    .WithMany(p => p.Inventory)
+                    .HasForeignKey(d => d.LocationId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK__Inventory__Locat__7D439ABD");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.Inventory)
+                    .HasForeignKey(d => d.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK__Inventory__Produ__7E37BEF6");
             });
 
             modelBuilder.Entity<Location>(entity =>
             {
-                entity.HasKey(e => e.Address)
-                    .HasName("PK__Location__7D0C3F33B4B28741");
+                entity.HasIndex(e => e.Address)
+                    .HasName("UQ__Location__7D0C3F3250AD82AE")
+                    .IsUnique();
 
-                entity.Property(e => e.Address).HasMaxLength(200);
+                entity.Property(e => e.LocationId).HasColumnName("LocationID");
 
-                entity.Property(e => e.City).HasMaxLength(200);
-
-                entity.Property(e => e.LocationId)
-                    .HasColumnName("locationID")
-                    .ValueGeneratedOnAdd();
-
-                entity.Property(e => e.State).HasMaxLength(200);
-            });
-
-            modelBuilder.Entity<Merchandise>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.Property(e => e.InventoryId).HasColumnName("inventoryID");
-
-                entity.Property(e => e.LocationAddress)
+                entity.Property(e => e.Address)
                     .IsRequired()
-                    .HasColumnName("locationAddress")
                     .HasMaxLength(200);
 
-                entity.HasOne(d => d.Inventory)
-                    .WithMany()
-                    .HasForeignKey(d => d.InventoryId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Merchandi__inven__5DCAEF64");
-
-                entity.HasOne(d => d.LocationAddressNavigation)
-                    .WithMany()
-                    .HasForeignKey(d => d.LocationAddress)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Merchandi__locat__5CD6CB2B");
-            });
-
-            modelBuilder.Entity<PlacedOrders>(entity =>
-            {
-                entity.HasKey(e => new { e.TimeOrdered, e.CustomerUsername })
-                    .HasName("PK__PlacedOr__A623FB1DB68084A3");
-
-                entity.Property(e => e.CustomerUsername).HasMaxLength(26);
-
-                entity.Property(e => e.LocationAddress)
+                entity.Property(e => e.City)
                     .IsRequired()
-                    .HasColumnName("locationAddress")
                     .HasMaxLength(200);
 
-                entity.Property(e => e.OrderId)
-                    .HasColumnName("orderID")
-                    .ValueGeneratedOnAdd();
+                entity.Property(e => e.State)
+                    .IsRequired()
+                    .HasMaxLength(200);
+            });
 
-                entity.Property(e => e.TotalAmount).HasColumnType("decimal(10, 2)");
+            modelBuilder.Entity<OrderHistory>(entity =>
+            {
+                entity.Property(e => e.OrderHistoryId).HasColumnName("OrderHistoryID");
 
-                entity.HasOne(d => d.CustomerUsernameNavigation)
-                    .WithMany(p => p.PlacedOrders)
-                    .HasForeignKey(d => d.CustomerUsername)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__PlacedOrd__Custo__5812160E");
+                entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
 
-                entity.HasOne(d => d.LocationAddressNavigation)
-                    .WithMany(p => p.PlacedOrders)
-                    .HasForeignKey(d => d.LocationAddress)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__PlacedOrd__locat__59063A47");
+                entity.Property(e => e.LocationId).HasColumnName("LocationID");
+
+                entity.HasOne(d => d.Customer)
+                    .WithMany(p => p.OrderHistory)
+                    .HasForeignKey(d => d.CustomerId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK__OrderHist__Custo__01142BA1");
+
+                entity.HasOne(d => d.Location)
+                    .WithMany(p => p.OrderHistory)
+                    .HasForeignKey(d => d.LocationId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK__OrderHist__Locat__02084FDA");
+            });
+
+            modelBuilder.Entity<Orders>(entity =>
+            {
+                entity.HasKey(e => e.OrderId)
+                    .HasName("PK__Orders__C3905BAF734D6EB3");
+
+                entity.Property(e => e.OrderId).HasColumnName("OrderID");
+
+                entity.Property(e => e.AmountOrdered).HasColumnType("decimal(10, 2)");
+
+                entity.Property(e => e.OrderHistoryId).HasColumnName("OrderHistoryID");
+
+                entity.Property(e => e.ProductId).HasColumnName("ProductID");
+
+                entity.HasOne(d => d.OrderHistory)
+                    .WithMany(p => p.Orders)
+                    .HasForeignKey(d => d.OrderHistoryId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK__Orders__OrderHis__05D8E0BE");
+
+                entity.HasOne(d => d.Product)
+                    .WithMany(p => p.Orders)
+                    .HasForeignKey(d => d.ProductId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK__Orders__ProductI__04E4BC85");
             });
 
             modelBuilder.Entity<Product>(entity =>
             {
-                entity.HasKey(e => e.Name)
-                    .HasName("PK__Product__737584F71D99FEE9");
+                entity.Property(e => e.ProductId).HasColumnName("ProductID");
 
-                entity.Property(e => e.Name).HasMaxLength(200);
-
-                entity.Property(e => e.MaxPerOrder).HasColumnName("maxPerOrder");
+                entity.Property(e => e.Name)
+                    .IsRequired()
+                    .HasMaxLength(200);
 
                 entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
-
-                entity.Property(e => e.ProductId)
-                    .HasColumnName("productID")
-                    .ValueGeneratedOnAdd();
-            });
-
-            modelBuilder.Entity<Purchased>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.Property(e => e.CustomerUsername)
-                    .IsRequired()
-                    .HasMaxLength(26);
-
-                entity.Property(e => e.ProductName)
-                    .HasColumnName("productName")
-                    .HasMaxLength(200);
-
-                entity.Property(e => e.TimeOrdered).HasColumnName("timeOrdered");
-
-                entity.HasOne(d => d.ProductNameNavigation)
-                    .WithMany()
-                    .HasForeignKey(d => d.ProductName)
-                    .HasConstraintName("FK__Purchased__produ__68487DD7");
-
-                entity.HasOne(d => d.PlacedOrders)
-                    .WithMany()
-                    .HasForeignKey(d => new { d.TimeOrdered, d.CustomerUsername })
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__Purchased__693CA210");
-            });
-
-            modelBuilder.Entity<Stock>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.Property(e => e.InventoryId).HasColumnName("inventoryID");
-
-                entity.Property(e => e.ProductName)
-                    .HasColumnName("productName")
-                    .HasMaxLength(200);
-
-                entity.HasOne(d => d.Inventory)
-                    .WithMany()
-                    .HasForeignKey(d => d.InventoryId)
-                    .HasConstraintName("FK__Stock__inventory__6E01572D");
-
-                entity.HasOne(d => d.ProductNameNavigation)
-                    .WithMany()
-                    .HasForeignKey(d => d.ProductName)
-                    .HasConstraintName("FK__Stock__productNa__6EF57B66");
             });
 
             OnModelCreatingPartial(modelBuilder);

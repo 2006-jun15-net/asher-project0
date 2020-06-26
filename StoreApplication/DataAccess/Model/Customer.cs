@@ -7,7 +7,7 @@ namespace DataAccess.Model
     {
         public Customer()
         {
-            PlacedOrders = new HashSet<PlacedOrders>();
+            OrderHistory = new HashSet<OrderHistory>();
         }
 
         public int CustomerId { get; set; }
@@ -15,6 +15,6 @@ namespace DataAccess.Model
         public string LastName { get; set; }
         public string UserName { get; set; }
 
-        public virtual ICollection<PlacedOrders> PlacedOrders { get; set; }
+        public virtual ICollection<OrderHistory> OrderHistory { get; set; }
     }
 }

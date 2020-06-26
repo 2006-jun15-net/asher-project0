@@ -7,7 +7,8 @@ namespace DataAccess.Model
     {
         public Location()
         {
-            PlacedOrders = new HashSet<PlacedOrders>();
+            Inventory = new HashSet<Inventory>();
+            OrderHistory = new HashSet<OrderHistory>();
         }
 
         public int LocationId { get; set; }
@@ -15,6 +16,7 @@ namespace DataAccess.Model
         public string City { get; set; }
         public string State { get; set; }
 
-        public virtual ICollection<PlacedOrders> PlacedOrders { get; set; }
+        public virtual ICollection<Inventory> Inventory { get; set; }
+        public virtual ICollection<OrderHistory> OrderHistory { get; set; }
     }
 }
