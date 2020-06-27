@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using StoreApplication.Library;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace StoreApplication.ConsoleApp
@@ -11,6 +12,8 @@ namespace StoreApplication.ConsoleApp
     public static class UI
     {
         private static string input;
+        private static Customer customer = new Customer();
+        private static CustomerRepository repository = new CustomerRepository(Program.context);
         public static void IntroMenu()
         {
             while(true)
@@ -50,14 +53,59 @@ namespace StoreApplication.ConsoleApp
 
                 if(input == "1")
                 {
-                    Console.WriteLine("New Customer");
+                    Console.WriteLine();
+                    EnterFullName();
+                    while (true)
+                    {
+                        Console.Write("Whats your UserName?: ");
+                        input = Console.ReadLine();
+                        if (input.Length > 26)
+                        {
+                            Console.WriteLine("Your Username is too long. It must be under 26 characters long");
+                        }
+                        else
+                        {
+                            customer.UserName = input;
+                            if (repository.findCustomer(customer.FirstName, customer.LastName, customer.UserName) != null)
+                            {
+                                Console.WriteLine("UserName already Exists. Please enter a different one.");
+                            }
+                            else
+                            {
+                                repository.AddCustomer(customer);
+                                break;
+                            }
+                        }
+
+                    }
                     Console.WriteLine();
                     break;
                 }
                 else if(input == "2")
                 {
-                    Console.WriteLine("Existing Customer");
                     Console.WriteLine();
+                    while (true)
+                    {
+                        EnterFullName();
+                        Console.Write("Whats your UserName?: ");
+                        input = Console.ReadLine();
+                        if (input.Length > 26)
+                        {
+                            Console.WriteLine("Your Username is too long. It must be under 26 characters long");
+                        }
+                        else
+                        {
+                            customer.UserName = input;
+                            if (repository.findCustomer(customer.FirstName, customer.LastName, customer.UserName) == null)
+                            {
+                                Console.WriteLine("One of your credentials was wrong. Please Try Again.");
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
                     break;
                 }
                 else if(input == "3")
@@ -73,14 +121,14 @@ namespace StoreApplication.ConsoleApp
             
         }
 
-        public static void AddCustomer()
+        public static void EnterFullName()
         {
-            while(true)
-            {
-                Console.Write("Whats your First Name?: ");
-                input = Console.ReadLine();
-                
-            }
+            Console.Write("Whats your First Name?: ");
+            input = Console.ReadLine();
+            customer.FirstName = input;
+            Console.Write("Whats your Last Name?: ");
+            input = Console.ReadLine();
+            customer.LastName = input;
         }
 
         public static void InvalidInput()

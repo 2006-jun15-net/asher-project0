@@ -33,11 +33,21 @@ namespace StoreApplication.Library
             {
                 return customers.Find(c => c.UserName == UserName);
             }
-            else
+            else if (customers.Count == 1)
             {
+                if(customers.Find(c => c.UserName == UserName) == null)
+                {
+                    return null;
+                }
+
                 return customers[0];
             }
+            else
+            {
+                return null;
+            }
         }
+
         public void Save()
         {
             context.SaveChanges();

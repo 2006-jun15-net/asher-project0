@@ -20,8 +20,8 @@ namespace StoreApplication.ConsoleApp
             //Store.LoadFromDatabase(context);
 
             CustomerRepository repository = new CustomerRepository(context);
-            var customer = repository.findCustomer("Christian", "Roberts", "EpicConsole123");
-
+            UI.IntroMenu();
+            /*
             Console.Write("Enter a username: ");
             string user = Console.ReadLine();
             if(user.Length > 26)
@@ -36,6 +36,7 @@ namespace StoreApplication.ConsoleApp
                     Console.WriteLine("not in DB");
                 }
             }
+            */
             
         }
     }
