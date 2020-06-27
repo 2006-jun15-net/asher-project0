@@ -13,7 +13,10 @@ namespace StoreApplication.ConsoleApp
     {
         private static string input;
         private static Customer customer = new Customer();
-        private static CustomerRepository repository = new CustomerRepository(Program.context);
+        private static CustomerRepository customerRepo = new CustomerRepository(Program.context);
+        private static GenericRepository<Location> locationRepo = new GenericRepository<Location>();
+        private static GenericRepository<Product> productRepo = new GenericRepository<Product>();
+        private static GenericRepository<Inventory> inventoryRepo = new GenericRepository<Inventory>();
         public static void IntroMenu()
         {
             while(true)
@@ -75,8 +78,8 @@ namespace StoreApplication.ConsoleApp
                             }
                             else
                             {
-                                repository.AddCustomer(customer);
-                                repository.Save();
+                                customerRepo.AddCustomer(customer);
+                                customerRepo.Save();
                                 generateMainMenu();
                                 break;
                             }
@@ -102,7 +105,7 @@ namespace StoreApplication.ConsoleApp
                         else
                         {
                             customer.UserName = input;
-                            if (repository.findCustomer(customer.FirstName, customer.LastName, customer.UserName) == null)
+                            if (customerRepo.findCustomer(customer.FirstName, customer.LastName, customer.UserName) == null)
                             {
                                 Console.WriteLine("One of your credentials was wrong. Please Try Again.");
                                 Console.WriteLine();
@@ -141,6 +144,8 @@ namespace StoreApplication.ConsoleApp
 
         public static void generateMainMenu()
         {
+            OrderHistory order = new OrderHistory();
+
             Console.WriteLine();
             Console.WriteLine("What would you like to do?");
             Console.WriteLine("1. Place an Order");
@@ -151,11 +156,66 @@ namespace StoreApplication.ConsoleApp
             input = Console.ReadLine();
             if(input == "1")
             {
-
+                while(true)
+                {
+                    Console.WriteLine();
+                    foreach (var element in locationRepo.GetAll())
+                    {
+                        Console.WriteLine($"{element.LocationId}: {element.Address}, {element.City}, {element.State}");
+                    }
+                    Console.WriteLine("Select a location or enter \"b\" to go back to the previous page.");
+                    Console.Write("Enter a valid choice: ");
+                    input = Console.ReadLine();
+                    int locationSelection = Int32.Parse(input);
+                    Location location = locationRepo.GetById(locationSelection);
+                    if (location != null)
+                    {
+                        order.Location = location;
+                        while(true)
+                        {
+                            foreach (var element in productRepo.GetAll())
+                            {
+                                Console.WriteLine($"{element.ProductId}. {element.Name}: ${element.Price}");
+                            }
+                            Console.WriteLine("Select a product.");
+                            Console.WriteLine("When you are finished, enter \"n\" to proceed or enter \"b\" to go back to the previous page.");
+                            Console.Write("Enter a valid choice: ");
+                            input = Console.ReadLine();
+                            int productSelection = Int32.Parse(input);
+                            Product product = productRepo.GetById(productSelection);
+                            if (product != null)
+                            {
+                                Inventory inventory = Program.context.Inventory.Where(i => (i.Location == location) && (i.Product == product)).FirstOrDefault();
+                                AddProduct(product, inventory);
+                            }
+                            else if(input == "n")
+                            {
+                                Console.WriteLine("next");
+                                break;
+                            }
+                            else if (input == "b")
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                InvalidInput();
+                            }
+                        }
+                    }
+                    else if (input == "b")
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        InvalidInput();
+                    }
+                }
             }
             else if(input == "2")
             {
-
+                Console.WriteLine("Not Implemented");
             }
             else if(input == "3")
             {
@@ -167,6 +227,40 @@ namespace StoreApplication.ConsoleApp
             }
         }
 
+        public static void AddProduct(Product product, Inventory inventory)
+        {
+            while(true)
+            {
+                Console.WriteLine();
+                Console.WriteLine("How many would you like order?");
+                Console.Write("Enter Amount: ");
+                input = Console.ReadLine();
+                int amount;
+                if (Int32.TryParse(input, out amount))
+                {
+                    if (amount > product.MaxPerOrder)
+                    {
+                        Console.WriteLine("You cannot order that much in a single order.");
+                    }
+                    else if (inventory.InStock < amount)
+                    {
+                        Console.WriteLine("Sorry, this location does not have that much in stock.");
+                        Console.WriteLine($"Current Stock: {inventory.InStock}");
+                    }
+                    else
+                    {
+                        inventory.InStock = inventory.InStock - amount;
+                        inventoryRepo.Update(inventory);
+                        //inventoryRepo.Save();
+                        break;
+                    }
+                }
+                else
+                {
+                    InvalidInput();
+                }
+            }
+        }
         public static void InvalidInput()
         {
             Console.WriteLine();

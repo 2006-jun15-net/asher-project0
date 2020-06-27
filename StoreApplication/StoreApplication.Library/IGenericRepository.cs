@@ -12,6 +12,5 @@ namespace StoreApplication.Library
         void Update(T obj);
         void Delete(object id);
         void Save();
-        void DisplayAll();
     }
 }

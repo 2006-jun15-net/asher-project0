@@ -20,8 +20,15 @@ namespace StoreApplication.ConsoleApp
             //Store.LoadFromDatabase(context);
 
             CustomerRepository repository = new CustomerRepository(context);
+            GenericRepository<Product> genericRepository= new GenericRepository<Product>();
+            GenericRepository<Location> genericRepository2 = new GenericRepository<Location>();
+            
             UI.IntroMenu();
             /*
+            if(genericRepository.GetById(6) == null)
+            {
+                Console.WriteLine("not exist");
+            }
             Console.Write("Enter a username: ");
             string user = Console.ReadLine();
             if(user.Length > 26)
@@ -37,7 +44,7 @@ namespace StoreApplication.ConsoleApp
                 }
             }
             */
-            
+
         }
     }
 }

@@ -55,11 +55,6 @@ namespace StoreApplication.Library
         {
             _context.SaveChanges();
         }
-
-        public void DisplayAll()
-        {
-            throw new NotImplementedException();
-        }
     }
     
 }
