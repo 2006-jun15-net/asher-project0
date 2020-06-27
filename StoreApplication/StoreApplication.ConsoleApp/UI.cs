@@ -27,6 +27,7 @@ namespace StoreApplication.ConsoleApp
                 if(input == "1")
                 {
                     ExistingOrNew();
+                    break;
                 }
                 else if(input == "2")
                 {
@@ -75,7 +76,8 @@ namespace StoreApplication.ConsoleApp
                             else
                             {
                                 repository.AddCustomer(customer);
-                                //repository.Save();
+                                repository.Save();
+                                generateMainMenu();
                                 break;
                             }
                         }
@@ -107,6 +109,7 @@ namespace StoreApplication.ConsoleApp
                             }
                             else
                             {
+                                generateMainMenu();
                                 break;
                             }
                         }
@@ -134,6 +137,34 @@ namespace StoreApplication.ConsoleApp
             Console.Write("Whats your Last Name?: ");
             input = Console.ReadLine();
             customer.LastName = input;
+        }
+
+        public static void generateMainMenu()
+        {
+            Console.WriteLine();
+            Console.WriteLine("What would you like to do?");
+            Console.WriteLine("1. Place an Order");
+            Console.WriteLine("2. View Order History");
+            Console.WriteLine("3. Exit Application");
+            Console.WriteLine();
+            Console.Write("Enter a valid choice: ");
+            input = Console.ReadLine();
+            if(input == "1")
+            {
+
+            }
+            else if(input == "2")
+            {
+
+            }
+            else if(input == "3")
+            {
+                return;
+            }
+            else
+            {
+                InvalidInput();
+            }
         }
 
         public static void InvalidInput()
