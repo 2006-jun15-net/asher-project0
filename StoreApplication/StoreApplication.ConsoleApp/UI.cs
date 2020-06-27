@@ -166,13 +166,22 @@ namespace StoreApplication.ConsoleApp
                     Console.WriteLine("Select a location or enter \"b\" to go back to the previous page.");
                     Console.Write("Enter a valid choice: ");
                     input = Console.ReadLine();
-                    int locationSelection = Int32.Parse(input);
-                    Location location = locationRepo.GetById(locationSelection);
+                    int locationSelection;
+                    Location location;
+                    if(Int32.TryParse(input, out locationSelection))
+                    {
+                        location = locationRepo.GetById(locationSelection);
+                    }
+                    else
+                    {
+                        location = null;
+                    }
                     if (location != null)
                     {
                         order.Location = location;
                         while(true)
                         {
+                            Console.WriteLine();
                             foreach (var element in productRepo.GetAll())
                             {
                                 Console.WriteLine($"{element.ProductId}. {element.Name}: ${element.Price}");
@@ -181,8 +190,16 @@ namespace StoreApplication.ConsoleApp
                             Console.WriteLine("When you are finished, enter \"n\" to proceed or enter \"b\" to go back to the previous page.");
                             Console.Write("Enter a valid choice: ");
                             input = Console.ReadLine();
-                            int productSelection = Int32.Parse(input);
-                            Product product = productRepo.GetById(productSelection);
+                            int productSelection;
+                            Product product;
+                            if (Int32.TryParse(input, out productSelection))
+                            {
+                                product = productRepo.GetById(productSelection);
+                            }
+                            else
+                            {
+                                product = null;
+                            }
                             if (product != null)
                             {
                                 Inventory inventory = Program.context.Inventory.Where(i => (i.Location == location) && (i.Product == product)).FirstOrDefault();
@@ -251,7 +268,7 @@ namespace StoreApplication.ConsoleApp
                     {
                         inventory.InStock = inventory.InStock - amount;
                         inventoryRepo.Update(inventory);
-                        //inventoryRepo.Save();
+                        inventoryRepo.Save();
                         break;
                     }
                 }
