@@ -62,17 +62,20 @@ namespace StoreApplication.ConsoleApp
                         if (input.Length > 26)
                         {
                             Console.WriteLine("Your Username is too long. It must be under 26 characters long");
+                            Console.WriteLine();
                         }
                         else
                         {
                             customer.UserName = input;
-                            if (repository.findCustomer(customer.FirstName, customer.LastName, customer.UserName) != null)
+                            if (Program.context.Customer.FirstOrDefault(c => c.UserName == customer.UserName) != null)
                             {
                                 Console.WriteLine("UserName already Exists. Please enter a different one.");
+                                Console.WriteLine();
                             }
                             else
                             {
                                 repository.AddCustomer(customer);
+                                //repository.Save();
                                 break;
                             }
                         }
@@ -92,6 +95,7 @@ namespace StoreApplication.ConsoleApp
                         if (input.Length > 26)
                         {
                             Console.WriteLine("Your Username is too long. It must be under 26 characters long");
+                            Console.WriteLine();
                         }
                         else
                         {
@@ -99,6 +103,7 @@ namespace StoreApplication.ConsoleApp
                             if (repository.findCustomer(customer.FirstName, customer.LastName, customer.UserName) == null)
                             {
                                 Console.WriteLine("One of your credentials was wrong. Please Try Again.");
+                                Console.WriteLine();
                             }
                             else
                             {
