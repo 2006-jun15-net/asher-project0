@@ -22,8 +22,11 @@ namespace StoreApplication.ConsoleApp
             CustomerRepository repository = new CustomerRepository(context);
             GenericRepository<Product> genericRepository= new GenericRepository<Product>();
             GenericRepository<Location> genericRepository2 = new GenericRepository<Location>();
-            
-            UI.IntroMenu();
+            GenericRepository<OrderHistory> generic = new GenericRepository<OrderHistory>();
+            //UI.IntroMenu();
+            //UI.DisplayOrder(generic.GetById(3));
+            //UI.DisplayCustomerOrderHistories(repository.GetById(1));
+            UI.DisplayLocationOrderHistories(genericRepository2.GetById(2));
             /*
             if(genericRepository.GetById(6) == null)
             {

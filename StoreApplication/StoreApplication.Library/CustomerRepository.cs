@@ -1,4 +1,5 @@
 ﻿using DataAccess.Model;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,14 +10,21 @@ namespace StoreApplication.Library
     public class CustomerRepository : ICustomerRepository
     {
         private Project0StoreContext context;
+        private DbSet<Customer> table = null;
 
         public CustomerRepository(Project0StoreContext context)
         {
             this.context = context;
+            table = context.Set<Customer>();
         }
         public IEnumerable GetCustomers()
         {
             return context.Customer.ToList();
+        }
+
+        public Customer GetById(object id)
+        {
+            return table.Find(id);
         }
 
         private List<Customer> findCustomerByName(string FirstName, string LastName)

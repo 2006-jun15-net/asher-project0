@@ -12,7 +12,7 @@ namespace StoreApplication.ConsoleApp
     public static class UI
     {
         private static string input;
-        private static Customer customer = new Customer();
+        private static Customer currentCustomer = new Customer();
         private static CustomerRepository customerRepo = new CustomerRepository(Program.context);
         private static GenericRepository<Location> locationRepo = new GenericRepository<Location>();
         private static GenericRepository<Product> productRepo = new GenericRepository<Product>();
@@ -70,15 +70,15 @@ namespace StoreApplication.ConsoleApp
                         }
                         else
                         {
-                            customer.UserName = input;
-                            if (Program.context.Customer.FirstOrDefault(c => c.UserName == customer.UserName) != null)
+                            currentCustomer.UserName = input;
+                            if (Program.context.Customer.FirstOrDefault(c => c.UserName == currentCustomer.UserName) != null)
                             {
                                 Console.WriteLine("UserName already Exists. Please enter a different one.");
                                 Console.WriteLine();
                             }
                             else
                             {
-                                customerRepo.AddCustomer(customer);
+                                customerRepo.AddCustomer(currentCustomer);
                                 customerRepo.Save();
                                 generateMainMenu();
                                 break;
@@ -104,14 +104,15 @@ namespace StoreApplication.ConsoleApp
                         }
                         else
                         {
-                            customer.UserName = input;
-                            if (customerRepo.findCustomer(customer.FirstName, customer.LastName, customer.UserName) == null)
+                            currentCustomer.UserName = input;
+                            if (customerRepo.findCustomer(currentCustomer.FirstName, currentCustomer.LastName, currentCustomer.UserName) == null)
                             {
                                 Console.WriteLine("One of your credentials was wrong. Please Try Again.");
                                 Console.WriteLine();
                             }
                             else
                             {
+                                currentCustomer = customerRepo.findCustomer(currentCustomer.FirstName, currentCustomer.LastName, currentCustomer.UserName);
                                 generateMainMenu();
                                 break;
                             }
@@ -136,16 +137,14 @@ namespace StoreApplication.ConsoleApp
         {
             Console.Write("Whats your First Name?: ");
             input = Console.ReadLine();
-            customer.FirstName = input;
+            currentCustomer.FirstName = input;
             Console.Write("Whats your Last Name?: ");
             input = Console.ReadLine();
-            customer.LastName = input;
+            currentCustomer.LastName = input;
         }
 
         public static void generateMainMenu()
         {
-            OrderHistory order = new OrderHistory();
-
             Console.WriteLine();
             Console.WriteLine("What would you like to do?");
             Console.WriteLine("1. Place an Order");
@@ -156,7 +155,9 @@ namespace StoreApplication.ConsoleApp
             input = Console.ReadLine();
             if(input == "1")
             {
-                while(true)
+                OrderHistory currentOrder = new OrderHistory();
+                List<Orders> orders = new List<Orders>();
+                while (true)
                 {
                     Console.WriteLine();
                     foreach (var element in locationRepo.GetAll())
@@ -178,7 +179,7 @@ namespace StoreApplication.ConsoleApp
                     }
                     if (location != null)
                     {
-                        order.Location = location;
+                        currentOrder.LocationId = location.LocationId;
                         while(true)
                         {
                             Console.WriteLine();
@@ -203,15 +204,29 @@ namespace StoreApplication.ConsoleApp
                             if (product != null)
                             {
                                 Inventory inventory = Program.context.Inventory.Where(i => (i.Location == location) && (i.Product == product)).FirstOrDefault();
-                                AddProduct(product, inventory);
+                                Orders customerOrder = AddProduct(product, inventory);
+                                orders.Add(customerOrder);
                             }
                             else if(input == "n")
                             {
-                                Console.WriteLine("next");
+                                Console.WriteLine();
+                                Console.WriteLine("Order Finished");
+                                Program.context.SaveChanges();
+                                currentOrder.CustomerId = currentCustomer.CustomerId;
+                                currentOrder.TimeOrdered = DateTime.Now;
+                                Program.context.OrderHistory.Add(currentOrder);
+                                Program.context.SaveChanges();
+                                foreach (var x in orders)
+                                {
+                                    x.OrderHistoryId = currentOrder.OrderHistoryId;
+                                    Program.context.Orders.Add(x);
+                                }
+                                Program.context.SaveChanges();
                                 break;
                             }
                             else if (input == "b")
                             {
+
                                 break;
                             }
                             else
@@ -244,9 +259,10 @@ namespace StoreApplication.ConsoleApp
             }
         }
 
-        public static void AddProduct(Product product, Inventory inventory)
+        public static Orders AddProduct(Product product, Inventory inventory)
         {
-            while(true)
+            Orders orders = new Orders();
+            while (true)
             {
                 Console.WriteLine();
                 Console.WriteLine("How many would you like order?");
@@ -266,9 +282,10 @@ namespace StoreApplication.ConsoleApp
                     }
                     else
                     {
+                        orders.ProductId = product.ProductId;
+                        orders.AmountOrdered = amount;
                         inventory.InStock = inventory.InStock - amount;
                         inventoryRepo.Update(inventory);
-                        inventoryRepo.Save();
                         break;
                     }
                 }
@@ -276,6 +293,50 @@ namespace StoreApplication.ConsoleApp
                 {
                     InvalidInput();
                 }
+            }
+
+            return orders;
+        }
+        public static void DisplayOrder(OrderHistory orderHistory)
+        {
+            var customerRef = Program.context.OrderHistory.Where(o => o.OrderHistoryId == orderHistory.OrderHistoryId).Include(c => c.Customer).FirstOrDefault();
+            Customer customer = customerRef.Customer;
+            var locationRef = Program.context.OrderHistory.Where(o => o.OrderHistoryId == orderHistory.OrderHistoryId).Include(l => l.Location).FirstOrDefault();
+            Location location = locationRef.Location;
+            List<Orders> orders = Program.context.Orders.Include(oh => oh.OrderHistory).ToList();
+            foreach(var order in orders)
+            {
+                if(order.OrderHistoryId != orderHistory.OrderHistoryId)
+                {
+                    orders.Remove(order);
+                }
+            }
+            Console.WriteLine($"Customer: {customer.FirstName} {customer.LastName}");
+            Console.WriteLine($"Store Location: {location.Address}, {location.City}, {location.State}");
+            Console.WriteLine("Purchased:");
+            foreach(var order in orders)
+            {
+                GenericRepository<Product> generic = new GenericRepository<Product>();
+                Console.WriteLine($"  {generic.GetById(order.ProductId).Name}");
+                Console.WriteLine($"    Amount Bought: {order.AmountOrdered}");
+            }
+        }
+        public static void DisplayCustomerOrderHistories(Customer customer)
+        {
+            var orderHistories = Program.context.OrderHistory.Where(o => o.CustomerId == customer.CustomerId);
+            Console.WriteLine($"{customer.FirstName} {customer.LastName} Order History:");
+            foreach(var history in orderHistories)
+            {
+                Console.WriteLine($"Order placed on {history.TimeOrdered}");
+            }
+        }
+        public static void DisplayLocationOrderHistories(Location location)
+        {
+            var orderHistories = Program.context.OrderHistory.Where(o => o.LocationId == location.LocationId);
+            Console.WriteLine($"Order Histories at {location.Address}, {location.City}, {location.State}:");
+            foreach (var history in orderHistories)
+            {
+                Console.WriteLine($"Order placed on {history.TimeOrdered}");
             }
         }
         public static void InvalidInput()
