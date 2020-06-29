@@ -18,6 +18,10 @@ namespace StoreApplication.ConsoleApp
         private static GenericRepository<Product> productRepo = new GenericRepository<Product>();
         private static GenericRepository<Inventory> inventoryRepo = new GenericRepository<Inventory>();
         private static List<OrderHistory> orderHistories = new List<OrderHistory>();
+
+        /// <summary>
+        /// Creates the starting UI for the user. Asking whether they would like to sign in or exit the application
+        /// </summary>
         public static void IntroMenu()
         {
             while(true)
@@ -44,7 +48,12 @@ namespace StoreApplication.ConsoleApp
             }
         }
 
-        public static void ExistingOrNew()
+        /// <summary>
+        /// Presents UI that determines whether we are dealing with a new customer or an existing one.
+        /// Users will be asked to enter in their credentials (first name, last name, and username) to confirm their identity or to create a
+        /// new account.
+        /// </summary>
+        private static void ExistingOrNew()
         {
             Console.WriteLine();
             while (true)
@@ -64,7 +73,11 @@ namespace StoreApplication.ConsoleApp
                     {
                         Console.Write("Whats your UserName?: ");
                         input = Console.ReadLine();
-                        if (input.Length > 26)
+                        if(input.Length == 0)
+                        {
+                            throw new ArgumentException("Username must not be empty.", nameof(input));
+                        }
+                        else if (input.Length > 26)
                         {
                             Console.WriteLine("Your Username is too long. It must be under 26 characters long");
                             Console.WriteLine();
@@ -98,7 +111,11 @@ namespace StoreApplication.ConsoleApp
                         EnterFullName();
                         Console.Write("Whats your UserName?: ");
                         input = Console.ReadLine();
-                        if (input.Length > 26)
+                        if (input.Length == 0)
+                        {
+                            throw new ArgumentException("Username must not be empty.", nameof(input));
+                        }
+                        else if (input.Length > 26)
                         {
                             Console.WriteLine("Your Username is too long. It must be under 26 characters long");
                             Console.WriteLine();
@@ -134,17 +151,39 @@ namespace StoreApplication.ConsoleApp
             
         }
 
-        public static void EnterFullName()
+        /// <summary>
+        /// Has User enter in their first and last name to store it within our currentCustomer object
+        /// </summary>
+        private static void EnterFullName()
         {
-            Console.Write("Whats your First Name?: ");
-            input = Console.ReadLine();
-            currentCustomer.FirstName = input;
-            Console.Write("Whats your Last Name?: ");
-            input = Console.ReadLine();
-            currentCustomer.LastName = input;
+            while (currentCustomer.FirstName == null)
+            {
+                Console.Write("Whats your First Name?: ");
+                input = Console.ReadLine();
+                if (input.Length == 0)
+                {
+                    throw new ArgumentException("First name must not be empty.", nameof(input));
+                }
+                currentCustomer.FirstName = input;
+            }
+            
+            while(currentCustomer.LastName == null)
+            {
+                Console.Write("Whats your Last Name?: ");
+                input = Console.ReadLine();
+                if (input.Length == 0)
+                {
+                    throw new ArgumentException("Last name must not be empty.", nameof(input));
+                }
+                currentCustomer.LastName = input;
+            }
         }
 
-        public static void generateMainMenu()
+        /// <summary>
+        /// Creates the main menu of our application.
+        /// Allows users to choose whether to place an order, view order histories, or exit the application
+        /// </summary>
+        private static void generateMainMenu()
         {
             while(true)
             {
@@ -175,17 +214,17 @@ namespace StoreApplication.ConsoleApp
             }
         }
 
-        public static void PlaceAnOrder()
+        /// <summary>
+        /// Creates UI for placing an order.
+        /// User first must choose a location to order from, then they must choose from a list of products to add to their order
+        /// </summary>
+        private static void PlaceAnOrder()
         {
             OrderHistory currentOrder = new OrderHistory();
             List<Orders> orders = new List<Orders>();
             while (true)
             {
-                Console.WriteLine();
-                foreach (var element in locationRepo.GetAll())
-                {
-                    Console.WriteLine($"{element.LocationId}: {element.Address}, {element.City}, {element.State}");
-                }
+                DisplayLocations();
                 Console.WriteLine("Select a location or enter \"b\" to go back to the previous page.");
                 Console.Write("Enter a valid choice: ");
                 input = Console.ReadLine();
@@ -199,16 +238,13 @@ namespace StoreApplication.ConsoleApp
                 {
                     location = null;
                 }
+
                 if (location != null)
                 {
                     currentOrder.LocationId = location.LocationId;
                     while (true)
                     {
-                        Console.WriteLine();
-                        foreach (var element in productRepo.GetAll())
-                        {
-                            Console.WriteLine($"{element.ProductId}. {element.Name}: ${element.Price}");
-                        }
+                        DisplayProducts();
                         Console.WriteLine();
                         Console.WriteLine("Select a product.");
                         Console.WriteLine("When you are finished, enter \"n\" to proceed or enter \"b\" to go back to the previous page.");
@@ -224,6 +260,7 @@ namespace StoreApplication.ConsoleApp
                         {
                             product = null;
                         }
+
                         if (product != null)
                         {
                             Inventory inventory = Program.context.Inventory.Where(i => (i.Location == location) && (i.Product == product)).FirstOrDefault();
@@ -233,7 +270,7 @@ namespace StoreApplication.ConsoleApp
                         else if (input == "n")
                         {
                             Console.WriteLine();
-                            Console.WriteLine("Order Finished");
+                            Console.WriteLine("Order Complete");
                             Program.context.SaveChanges();
                             currentOrder.CustomerId = currentCustomer.CustomerId;
                             currentOrder.TimeOrdered = DateTime.Now;
@@ -270,7 +307,38 @@ namespace StoreApplication.ConsoleApp
 
             return;
         }
-        public static Orders AddProduct(Product product, Inventory inventory)
+
+        /// <summary>
+        /// Displays the locations in the DB in a numbered list
+        /// </summary>
+        private static void DisplayLocations()
+        {
+            Console.WriteLine();
+            foreach (var element in locationRepo.GetAll())
+            {
+                Console.WriteLine($"{element.LocationId}: {element.Address}, {element.City}, {element.State}");
+            }
+        }
+
+        /// <summary>
+        /// Displays the Products in the DB in a numbered list
+        /// </summary>
+        private static void DisplayProducts()
+        {
+            Console.WriteLine();
+            foreach (var element in productRepo.GetAll())
+            {
+                Console.WriteLine($"{element.ProductId}. {element.Name}: ${element.Price}");
+            }
+        }
+
+        /// <summary>
+        /// Has User enter how much of a product they want to order, then adds this product and its quantity to our current order
+        /// </summary>
+        /// <param name="product"></param>
+        /// <param name="inventory"></param>
+        /// <returns></returns>
+        private static Orders AddProduct(Product product, Inventory inventory)
         {
             Orders orders = new Orders();
             while (true)
@@ -308,7 +376,11 @@ namespace StoreApplication.ConsoleApp
 
             return orders;
         }
-        public static void ViewOrderHistories()
+
+        /// <summary>
+        /// Displays View Order History UI where it asks the user which order histories they would like to view
+        /// </summary>
+        private static void ViewOrderHistories()
         {
             while (true)
             {
@@ -349,12 +421,7 @@ namespace StoreApplication.ConsoleApp
                 {
                     while (true)
                     {
-                        Console.WriteLine();
-                        Console.WriteLine("Which location's history would you like to view?");
-                        foreach (var element in locationRepo.GetAll())
-                        {
-                            Console.WriteLine($"{element.LocationId}: {element.Address}, {element.City}, {element.State}");
-                        }
+                        DisplayLocations();
                         Console.WriteLine();
                         Console.WriteLine("Select a location or enter \"b\" to go back to the previous page.");
                         Console.Write("Enter a valid choice: ");
@@ -369,6 +436,7 @@ namespace StoreApplication.ConsoleApp
                         {
                             location = null;
                         }
+
                         if (location != null)
                         {
                             while (true)
@@ -414,7 +482,12 @@ namespace StoreApplication.ConsoleApp
 
             return;
         }
-        public static void DisplayOrder(OrderHistory orderHistory)
+
+        /// <summary>
+        /// Displays the information of an Order, (Customer who made the order, Location order was placed, and products ordered)
+        /// </summary>
+        /// <param name="orderHistory"></param>
+        private static void DisplayOrder(OrderHistory orderHistory)
         {
             var customerRef = Program.context.OrderHistory.Where(o => o.OrderHistoryId == orderHistory.OrderHistoryId).Include(c => c.Customer).FirstOrDefault();
             Customer customer = customerRef.Customer;
@@ -442,7 +515,12 @@ namespace StoreApplication.ConsoleApp
                 Console.WriteLine($"    Amount Bought: {order.AmountOrdered}");
             }
         }
-        public static void DisplayCustomerOrderHistories(Customer customer)
+
+        /// <summary>
+        /// Displays a list of all of the orders that a customer has made
+        /// </summary>
+        /// <param name="customer"></param>
+        private static void DisplayCustomerOrderHistories(Customer customer)
         {
             Console.WriteLine();
             orderHistories = Program.context.OrderHistory.Where(o => o.CustomerId == customer.CustomerId).ToList();
@@ -462,7 +540,12 @@ namespace StoreApplication.ConsoleApp
             }
             Console.WriteLine();
         }
-        public static void DisplayLocationOrderHistories(Location location)
+
+        /// <summary>
+        /// Displays a list of all the orders that a location has received
+        /// </summary>
+        /// <param name="location"></param>
+        private static void DisplayLocationOrderHistories(Location location)
         {
             Console.WriteLine();
             orderHistories = Program.context.OrderHistory.Where(o => o.LocationId == location.LocationId).ToList();
@@ -481,7 +564,11 @@ namespace StoreApplication.ConsoleApp
                 count++;
             }
         }
-        public static void InvalidInput()
+
+        /// <summary>
+        /// Contains responses to when a user enters invalid input to any of the requests made by the application
+        /// </summary>
+        private static void InvalidInput()
         {
             Console.WriteLine();
             Console.WriteLine("That's not a valid choice. Please try again.");
