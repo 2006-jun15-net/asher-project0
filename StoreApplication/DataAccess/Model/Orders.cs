@@ -8,7 +8,7 @@ namespace DataAccess.Model
         public int OrderId { get; set; }
         public int? ProductId { get; set; }
         public int? OrderHistoryId { get; set; }
-        public decimal AmountOrdered { get; set; }
+        public int? AmountOrdered { get; set; }
 
         public virtual OrderHistory OrderHistory { get; set; }
         public virtual Product Product { get; set; }

@@ -124,8 +124,6 @@ namespace DataAccess.Model
 
                 entity.Property(e => e.OrderId).HasColumnName("OrderID");
 
-                entity.Property(e => e.AmountOrdered).HasColumnType("decimal(10, 2)");
-
                 entity.Property(e => e.OrderHistoryId).HasColumnName("OrderHistoryID");
 
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
@@ -145,6 +143,10 @@ namespace DataAccess.Model
 
             modelBuilder.Entity<Product>(entity =>
             {
+                entity.HasIndex(e => e.Name)
+                    .HasName("product_name_unique")
+                    .IsUnique();
+
                 entity.Property(e => e.ProductId).HasColumnName("ProductID");
 
                 entity.Property(e => e.Name)
