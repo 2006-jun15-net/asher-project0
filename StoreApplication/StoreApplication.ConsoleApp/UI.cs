@@ -73,34 +73,41 @@ namespace StoreApplication.ConsoleApp
                     EnterFullName();
                     while (true)
                     {
-                        Console.Write("Whats your UserName?: ");
-                        input = Console.ReadLine();
-                        if(input.Length == 0)
+                        try
                         {
-                            throw new ArgumentException("Username must not be empty.", nameof(input));
-                        }
-                        else if (input.Length > 26)
-                        {
-                            Console.WriteLine("Your Username is too long. It must be under 26 characters long");
-                            Console.WriteLine();
-                        }
-                        else
-                        {
-                            currentCustomer.UserName = input;
-                            if (customerRepo.DoesUsernameExist(currentCustomer))
+                            Console.Write("Whats your UserName?: ");
+                            input = Console.ReadLine();
+                            if (input.Length == 0)
                             {
-                                Console.WriteLine("UserName already Exists. Please enter a different one.");
+                                throw new ArgumentException("Username must not be empty.", nameof(input));
+                            }
+                            else if (input.Length > 26)
+                            {
+                                Console.WriteLine("Your Username is too long. It must be under 26 characters long");
                                 Console.WriteLine();
                             }
                             else
                             {
-                                customerRepo.AddCustomer(currentCustomer);
-                                customerRepo.Save();
-                                generateMainMenu();
-                                break;
+                                currentCustomer.UserName = input;
+                                if (customerRepo.DoesUsernameExist(currentCustomer))
+                                {
+                                    Console.WriteLine("UserName already Exists. Please enter a different one.");
+                                    Console.WriteLine();
+                                }
+                                else
+                                {
+                                    customerRepo.AddCustomer(currentCustomer);
+                                    customerRepo.Save();
+                                    generateMainMenu();
+                                    break;
+                                }
                             }
                         }
-
+                        catch(ArgumentException e)
+                        {
+                            Console.WriteLine(e.Message);
+                            Console.WriteLine();
+                        }
                     }
                     Console.WriteLine();
                     break;
@@ -110,33 +117,42 @@ namespace StoreApplication.ConsoleApp
                     Console.WriteLine();
                     while (true)
                     {
-                        EnterFullName();
-                        Console.Write("Whats your UserName?: ");
-                        input = Console.ReadLine();
-                        if (input.Length == 0)
+                        try
                         {
-                            throw new ArgumentException("Username must not be empty.", nameof(input));
-                        }
-                        else if (input.Length > 26)
-                        {
-                            Console.WriteLine("Your Username is too long. It must be under 26 characters long");
-                            Console.WriteLine();
-                        }
-                        else
-                        {
-                            currentCustomer.UserName = input;
-                            if (customerRepo.findCustomer(currentCustomer.FirstName, currentCustomer.LastName, currentCustomer.UserName) == null)
+                            EnterFullName();
+                            Console.Write("Whats your UserName?: ");
+                            input = Console.ReadLine();
+                            if (input.Length == 0)
                             {
-                                Console.WriteLine("One of your credentials was wrong. Please Try Again.");
+                                throw new ArgumentException("Username must not be empty.", nameof(input));
+                            }
+                            else if (input.Length > 26)
+                            {
+                                Console.WriteLine("Your Username is too long. It must be under 26 characters long");
                                 Console.WriteLine();
                             }
                             else
                             {
-                                currentCustomer = customerRepo.findCustomer(currentCustomer.FirstName, currentCustomer.LastName, currentCustomer.UserName);
-                                generateMainMenu();
-                                break;
+                                currentCustomer.UserName = input;
+                                if (customerRepo.findCustomer(currentCustomer.FirstName, currentCustomer.LastName, currentCustomer.UserName) == null)
+                                {
+                                    Console.WriteLine("One of your credentials was wrong. Please Try Again.");
+                                    Console.WriteLine();
+                                }
+                                else
+                                {
+                                    currentCustomer = customerRepo.findCustomer(currentCustomer.FirstName, currentCustomer.LastName, currentCustomer.UserName);
+                                    generateMainMenu();
+                                    break;
+                                }
                             }
                         }
+                        catch(ArgumentException e)
+                        {
+                            Console.WriteLine(e.Message);
+                            Console.WriteLine();
+                        }
+                        
                     }
                     break;
                 }
@@ -160,24 +176,41 @@ namespace StoreApplication.ConsoleApp
         {
             while (currentCustomer.FirstName == null)
             {
-                Console.Write("Whats your First Name?: ");
-                input = Console.ReadLine();
-                if (input.Length == 0)
+                try
                 {
-                    throw new ArgumentException("First name must not be empty.", nameof(input));
+                    Console.Write("Whats your First Name?: ");
+                    input = Console.ReadLine();
+                    if (input.Length == 0)
+                    {
+                        throw new ArgumentException("First name must not be empty.", nameof(input));
+                    }
+                    currentCustomer.FirstName = input;
                 }
-                currentCustomer.FirstName = input;
+                catch(ArgumentException e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine();
+                }
+                
             }
             
             while(currentCustomer.LastName == null)
             {
-                Console.Write("Whats your Last Name?: ");
-                input = Console.ReadLine();
-                if (input.Length == 0)
+                try
                 {
-                    throw new ArgumentException("Last name must not be empty.", nameof(input));
+                    Console.Write("Whats your Last Name?: ");
+                    input = Console.ReadLine();
+                    if (input.Length == 0)
+                    {
+                        throw new ArgumentException("Last name must not be empty.", nameof(input));
+                    }
+                    currentCustomer.LastName = input;
                 }
-                currentCustomer.LastName = input;
+                catch(ArgumentException e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine();
+                }
             }
         }
 
