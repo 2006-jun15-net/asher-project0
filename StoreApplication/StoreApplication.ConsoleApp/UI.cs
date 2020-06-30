@@ -14,9 +14,11 @@ namespace StoreApplication.ConsoleApp
         private static string input;
         private static Customer currentCustomer = new Customer();
         private static CustomerRepository customerRepo = new CustomerRepository(Program.context);
-        private static GenericRepository<Location> locationRepo = new GenericRepository<Location>();
+        private static LocationRepository locationRepo = new LocationRepository(Program.context);
         private static GenericRepository<Product> productRepo = new GenericRepository<Product>();
-        private static GenericRepository<Inventory> inventoryRepo = new GenericRepository<Inventory>();
+        private static InventoryRepository inventoryRepo = new InventoryRepository(Program.context);
+        private static OrderHistoryRepository OrderHistoryRepo = new OrderHistoryRepository(Program.context);
+        private static OrdersRepository OrdersRepo = new OrdersRepository(Program.context);
         private static List<OrderHistory> orderHistories = new List<OrderHistory>();
 
         /// <summary>
@@ -85,7 +87,7 @@ namespace StoreApplication.ConsoleApp
                         else
                         {
                             currentCustomer.UserName = input;
-                            if (Program.context.Customer.FirstOrDefault(c => c.UserName == currentCustomer.UserName) != null)
+                            if (customerRepo.DoesUsernameExist(currentCustomer))
                             {
                                 Console.WriteLine("UserName already Exists. Please enter a different one.");
                                 Console.WriteLine();
@@ -232,7 +234,7 @@ namespace StoreApplication.ConsoleApp
                 Location location;
                 if (Int32.TryParse(input, out locationSelection))
                 {
-                    location = locationRepo.GetById(locationSelection);
+                    location = locationRepo.GetByID(locationSelection);
                 }
                 else
                 {
@@ -263,7 +265,7 @@ namespace StoreApplication.ConsoleApp
 
                         if (product != null)
                         {
-                            Inventory inventory = Program.context.Inventory.Where(i => (i.Location == location) && (i.Product == product)).FirstOrDefault();
+                            Inventory inventory = inventoryRepo.FindLocationInventory(location, product);
                             Orders customerOrder = AddProduct(product, inventory);
                             orders.Add(customerOrder);
                         }
@@ -294,6 +296,7 @@ namespace StoreApplication.ConsoleApp
                             InvalidInput();
                         }
                     }
+                    break;
                 }
                 else if (input == "b")
                 {
@@ -397,23 +400,36 @@ namespace StoreApplication.ConsoleApp
                 {
                     while (true)
                     {
-                        DisplayCustomerOrderHistories(currentCustomer);
-                        Console.WriteLine();
-                        Console.WriteLine("Select a Order History or enter \"b\" to go back to the previous page.");
-                        Console.Write("Enter a valid choice: ");
-                        input = Console.ReadLine();
-                        int orderSelection;
-                        if (Int32.TryParse(input, out orderSelection))
+                        if(DisplayCustomerOrderHistories(currentCustomer))
                         {
-                            DisplayOrder(orderHistories[orderSelection - 1]);
-                        }
-                        else if (input == "b")
-                        {
-                            break;
+                            Console.WriteLine();
+                            Console.WriteLine("Select a Order History or enter \"b\" to go back to the previous page.");
+                            Console.Write("Enter a valid choice: ");
+                            input = Console.ReadLine();
+                            int orderSelection;
+                            if (Int32.TryParse(input, out orderSelection))
+                            {
+                                if(orderSelection > 0 && orderSelection < orderHistories.Count + 1)
+                                {
+                                    DisplayOrder(orderHistories[orderSelection - 1]);
+                                }
+                                else
+                                {
+                                    InvalidInput();
+                                }
+                            }
+                            else if (input == "b")
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                InvalidInput();
+                            }
                         }
                         else
                         {
-                            InvalidInput();
+                            break;
                         }
                     }
                 }
@@ -430,7 +446,7 @@ namespace StoreApplication.ConsoleApp
                         Location location;
                         if (Int32.TryParse(input, out locationSelection))
                         {
-                            location = locationRepo.GetById(locationSelection);
+                            location = locationRepo.GetByID(locationSelection);
                         }
                         else
                         {
@@ -441,22 +457,37 @@ namespace StoreApplication.ConsoleApp
                         {
                             while (true)
                             {
-                                DisplayLocationOrderHistories(location);
-                                Console.WriteLine("Select a Order History or enter \"b\" to go back to the previous page.");
-                                Console.Write("Enter a valid choice: ");
-                                input = Console.ReadLine();
-                                int orderSelection;
-                                if (Int32.TryParse(input, out orderSelection))
+                                if(DisplayLocationOrderHistories(location))
                                 {
-                                    DisplayOrder(orderHistories[orderSelection - 1]);
-                                }
-                                else if (input == "b")
-                                {
-                                    break;
+                                    Console.WriteLine();
+                                    Console.WriteLine("Select a Order History or enter \"b\" to go back to the previous page.");
+                                    Console.Write("Enter a valid choice: ");
+                                    input = Console.ReadLine();
+                                    int orderSelection;
+                                    if (Int32.TryParse(input, out orderSelection))
+                                    {
+                                        if(orderSelection > 0 && orderSelection < orderHistories.Count + 1)
+                                        {
+                                            DisplayOrder(orderHistories[orderSelection - 1]);
+                                        }
+                                        else
+                                        {
+                                            InvalidInput();
+                                        }
+                                        
+                                    }
+                                    else if (input == "b")
+                                    {
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        InvalidInput();
+                                    }
                                 }
                                 else
                                 {
-                                    InvalidInput();
+                                    break;
                                 }
                             }
                         }
@@ -489,11 +520,12 @@ namespace StoreApplication.ConsoleApp
         /// <param name="orderHistory"></param>
         private static void DisplayOrder(OrderHistory orderHistory)
         {
-            var customerRef = Program.context.OrderHistory.Where(o => o.OrderHistoryId == orderHistory.OrderHistoryId).Include(c => c.Customer).FirstOrDefault();
+            var customerRef = OrderHistoryRepo.getCustomerRef(orderHistory);
             Customer customer = customerRef.Customer;
-            var locationRef = Program.context.OrderHistory.Where(o => o.OrderHistoryId == orderHistory.OrderHistoryId).Include(l => l.Location).FirstOrDefault();
+            var locationRef = OrderHistoryRepo.getLocationRef(orderHistory);
             Location location = locationRef.Location;
-            List<Orders> orders = Program.context.Orders.Include(oh => oh.OrderHistory).ToList();
+            //List<Orders> orders = Program.context.Orders.Include(oh => oh.OrderHistory).ToList();
+            List<Orders> orders = OrdersRepo.GetAllOrdersInHistory().ToList();
 
             // added .ToList() in foreach b/c somewhere under the hood, something was indirectly changing my list of orderhistories.
             // so by adding .ToList() it copies the values in orders to a separate new list at the start of the foreach
@@ -508,27 +540,30 @@ namespace StoreApplication.ConsoleApp
             Console.WriteLine($"Customer: {customer.FirstName} {customer.LastName}");
             Console.WriteLine($"Store Location: {location.Address}, {location.City}, {location.State}");
             Console.WriteLine("Purchased:");
+            double totalSum = 0.0;
             foreach(var order in orders)
             {
-                GenericRepository<Product> generic = new GenericRepository<Product>();
-                Console.WriteLine($"  {generic.GetById(order.ProductId).Name}");
+                Console.WriteLine($"  {productRepo.GetById(order.ProductId).Name}");
                 Console.WriteLine($"    Amount Bought: {order.AmountOrdered}");
+                totalSum += OrdersRepo.CalculateTotal(productRepo.GetById(order.ProductId), order);
             }
+            Console.WriteLine($"Total cost: ${totalSum}");
         }
 
         /// <summary>
         /// Displays a list of all of the orders that a customer has made
         /// </summary>
         /// <param name="customer"></param>
-        private static void DisplayCustomerOrderHistories(Customer customer)
+        private static bool DisplayCustomerOrderHistories(Customer customer)
         {
             Console.WriteLine();
-            orderHistories = Program.context.OrderHistory.Where(o => o.CustomerId == customer.CustomerId).ToList();
+            //orderHistories = Program.context.OrderHistory.Where(o => o.CustomerId == customer.CustomerId).ToList();
+            orderHistories = OrderHistoryRepo.GetAllCustomerOrders(customer).ToList();
 
             if(orderHistories.Count == 0)
             {
                 Console.WriteLine("You haven't made any orders.");
-                return;
+                return false;
             }
 
             Console.WriteLine($"{customer.FirstName} {customer.LastName} Order History:");
@@ -538,22 +573,24 @@ namespace StoreApplication.ConsoleApp
                 Console.WriteLine($"   {count}: Order placed on {history.TimeOrdered}");
                 count++;
             }
-            Console.WriteLine();
+            
+            return true;
         }
 
         /// <summary>
         /// Displays a list of all the orders that a location has received
         /// </summary>
         /// <param name="location"></param>
-        private static void DisplayLocationOrderHistories(Location location)
+        private static bool DisplayLocationOrderHistories(Location location)
         {
             Console.WriteLine();
-            orderHistories = Program.context.OrderHistory.Where(o => o.LocationId == location.LocationId).ToList();
+            //orderHistories = Program.context.OrderHistory.Where(o => o.LocationId == location.LocationId).ToList();
+            orderHistories = OrderHistoryRepo.GetAllLocationOrders(location).ToList();
 
             if(orderHistories.Count == 0)
             {
                 Console.WriteLine("This store location has not received any orders.");
-                return;
+                return false;
             }
 
             Console.WriteLine($"Order Histories at {location.Address}, {location.City}, {location.State}:");
@@ -563,6 +600,8 @@ namespace StoreApplication.ConsoleApp
                 Console.WriteLine($"   {count}: Order placed on {history.TimeOrdered}");
                 count++;
             }
+
+            return true;
         }
 
         /// <summary>

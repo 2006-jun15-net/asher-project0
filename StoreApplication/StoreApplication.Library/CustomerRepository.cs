@@ -12,6 +12,11 @@ namespace StoreApplication.Library
         private Project0StoreContext context;
         private DbSet<Customer> table = null;
 
+        public CustomerRepository()
+        {
+            context = new Project0StoreContext();
+            table = context.Set<Customer>();
+        }
         public CustomerRepository(Project0StoreContext context)
         {
             this.context = context;
@@ -27,6 +32,12 @@ namespace StoreApplication.Library
             return table.Find(id);
         }
 
+        /// <summary>
+        /// Looks in the DB for any customer with the given first and last names
+        /// </summary>
+        /// <param name="FirstName"></param>
+        /// <param name="LastName"></param>
+        /// <returns></returns>
         private List<Customer> findCustomerByName(string FirstName, string LastName)
         {
 
@@ -34,6 +45,7 @@ namespace StoreApplication.Library
             return customer;
         }
 
+        // Looks in the DB for any customer with the given first,last, and username
         public Customer findCustomer(string FirstName, string LastName, string UserName)
         {
             List<Customer> customers = findCustomerByName(FirstName, LastName);
@@ -64,6 +76,12 @@ namespace StoreApplication.Library
         public void AddCustomer(Customer customer)
         {
             context.Customer.Add(customer);
+        }
+
+        public bool DoesUsernameExist(Customer customer)
+        {
+            bool result = (context.Customer.FirstOrDefault(c => c.UserName == customer.UserName) != null);
+            return result;
         }
     }
 }
