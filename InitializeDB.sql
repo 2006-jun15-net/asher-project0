@@ -54,7 +54,7 @@ VALUES
 ('294 Harwood Dr.', 
  'New York City', 
  'New York'
-)
+),
 ('9162 Grand Avenue',
  'Houston',
  'Texas'
