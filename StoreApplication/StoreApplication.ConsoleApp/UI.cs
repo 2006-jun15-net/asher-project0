@@ -20,6 +20,7 @@ namespace StoreApplication.ConsoleApp
         private static OrderHistoryRepository OrderHistoryRepo = new OrderHistoryRepository(Program.context);
         private static OrdersRepository OrdersRepo = new OrdersRepository(Program.context);
         private static List<OrderHistory> orderHistories = new List<OrderHistory>();
+        private static List<Product> addedProducts = new List<Product>();
 
         /// <summary>
         /// Creates the starting UI for the user. Asking whether they would like to sign in or exit the application
@@ -289,7 +290,7 @@ namespace StoreApplication.ConsoleApp
                         Product product;
                         if (Int32.TryParse(input, out productSelection))
                         {
-                            product = productRepo.GetById(productSelection);
+                            product = productRepo.GetById(productSelection + addedProducts.Count);
                         }
                         else
                         {
@@ -317,11 +318,12 @@ namespace StoreApplication.ConsoleApp
                                 Program.context.Orders.Add(x);
                             }
                             Program.context.SaveChanges();
+                            addedProducts.Clear();
                             break;
                         }
                         else if (input == "b")
                         {
-
+                            addedProducts.Clear();
                             break;
                         }
                         else
@@ -361,10 +363,15 @@ namespace StoreApplication.ConsoleApp
         /// </summary>
         private static void DisplayProducts()
         {
+            int listCount = 1;
             Console.WriteLine();
             foreach (var element in productRepo.GetAll())
             {
-                Console.WriteLine($"{element.ProductId}. {element.Name}: ${element.Price}");
+                if(!addedProducts.Contains(element))
+                {
+                    Console.WriteLine($"{listCount}. {element.Name}: ${element.Price}");
+                    listCount++;
+                }
             }
         }
 
@@ -401,6 +408,7 @@ namespace StoreApplication.ConsoleApp
                         orders.AmountOrdered = amount;
                         inventory.InStock = inventory.InStock - amount;
                         inventoryRepo.Update(inventory);
+                        addedProducts.Add(product);
                         break;
                     }
                 }
@@ -444,7 +452,7 @@ namespace StoreApplication.ConsoleApp
                             {
                                 if(orderSelection > 0 && orderSelection < orderHistories.Count + 1)
                                 {
-                                    DisplayOrder(orderHistories[orderSelection - 1]);
+                                    DisplayOrder(orderHistories[orderSelection - 1], false);
                                 }
                                 else
                                 {
@@ -501,7 +509,7 @@ namespace StoreApplication.ConsoleApp
                                     {
                                         if(orderSelection > 0 && orderSelection < orderHistories.Count + 1)
                                         {
-                                            DisplayOrder(orderHistories[orderSelection - 1]);
+                                            DisplayOrder(orderHistories[orderSelection - 1], true);
                                         }
                                         else
                                         {
@@ -551,7 +559,7 @@ namespace StoreApplication.ConsoleApp
         /// Displays the information of an Order, (Customer who made the order, Location order was placed, and products ordered)
         /// </summary>
         /// <param name="orderHistory"></param>
-        private static void DisplayOrder(OrderHistory orderHistory)
+        private static void DisplayOrder(OrderHistory orderHistory, bool viewingLocation)
         {
             var customerRef = OrderHistoryRepo.getCustomerRef(orderHistory);
             Customer customer = customerRef.Customer;
@@ -570,7 +578,10 @@ namespace StoreApplication.ConsoleApp
                 }
             }
             Console.WriteLine();
-            Console.WriteLine($"Customer: {customer.FirstName} {customer.LastName}");
+            if(!viewingLocation)
+            {
+                Console.WriteLine($"Customer: {customer.FirstName} {customer.LastName}");
+            }
             Console.WriteLine($"Store Location: {location.Address}, {location.City}, {location.State}");
             Console.WriteLine("Purchased:");
             double totalSum = 0.0;
