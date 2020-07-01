@@ -290,7 +290,11 @@ namespace StoreApplication.ConsoleApp
                         Product product;
                         if (Int32.TryParse(input, out productSelection))
                         {
-                            product = productRepo.GetById(productSelection + addedProducts.Count);
+                            product = productRepo.GetById(productSelection);
+                            if(addedProducts.Contains(product))
+                            {
+                                product = null;
+                            }
                         }
                         else
                         {
@@ -363,14 +367,12 @@ namespace StoreApplication.ConsoleApp
         /// </summary>
         private static void DisplayProducts()
         {
-            int listCount = 1;
             Console.WriteLine();
             foreach (var element in productRepo.GetAll())
             {
                 if(!addedProducts.Contains(element))
                 {
-                    Console.WriteLine($"{listCount}. {element.Name}: ${element.Price}");
-                    listCount++;
+                    Console.WriteLine($"{element.ProductId}. {element.Name}: ${element.Price}");
                 }
             }
         }
