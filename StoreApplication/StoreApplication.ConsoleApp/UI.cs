@@ -143,6 +143,7 @@ namespace StoreApplication.ConsoleApp
                                 else
                                 {
                                     currentCustomer = customerRepo.findCustomer(currentCustomer.FirstName, currentCustomer.LastName, currentCustomer.UserName);
+                                    Program.context.SaveChanges();
                                     generateMainMenu();
                                     break;
                                 }

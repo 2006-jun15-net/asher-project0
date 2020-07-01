@@ -54,6 +54,14 @@ VALUES
 ('294 Harwood Dr.', 
  'New York City', 
  'New York'
+)
+('9162 Grand Avenue',
+ 'Houston',
+ 'Texas'
+),
+('361 Trinity Rd.',
+ 'Seattle',
+ 'Washington'
 );
 INSERT INTO Product
 (Name, Price, MaxPerOrder)
@@ -130,7 +138,27 @@ VALUES
 (3, 7, 84), 
 (3, 8, 99), 
 (3, 9, 51), 
-(3, 10, 47);
+(3, 10, 47),
+(4, 1, 69), 
+(4, 2, 96), 
+(4, 3, 81), 
+(4, 4, 70), 
+(4, 5, 126), 
+(4, 6, 66), 
+(4, 7, 84), 
+(4, 8, 99), 
+(4, 9, 51), 
+(4, 10, 47),
+(5, 1, 69), 
+(5, 2, 96), 
+(5, 3, 81), 
+(5, 4, 70), 
+(5, 5, 126), 
+(5, 6, 66), 
+(5, 7, 84), 
+(5, 8, 99), 
+(5, 9, 51), 
+(5, 10, 47);
 INSERT INTO Customer
 (FirstName, LastName, UserName)
 VALUES
