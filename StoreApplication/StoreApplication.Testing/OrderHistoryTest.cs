@@ -43,5 +43,15 @@ namespace StoreApplication.Testing
 
             Assert.True(location.LocationId == locationID);
         }
+
+        [Fact]
+        public void OrderHistoryReturnsNullIfNotFound()
+        {
+            OrderHistoryRepository orderHistoryRepo = new OrderHistoryRepository(context);
+            var oh = orderHistoryRepo.GetById(0);
+
+            Assert.Null(oh);
+
+        }
     }
 }
